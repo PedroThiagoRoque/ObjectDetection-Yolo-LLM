@@ -26,7 +26,7 @@ if openai.api_key is None:
     raise RuntimeError("Defina OPENAI_API_KEY no arquivo .env")
 
 model = YOLO(MODEL_PATH)
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 if not cap.isOpened():
     raise RuntimeError("Não foi possível acessar a webcam")
 
@@ -59,5 +59,35 @@ def summarize_labels(labels: list[str]) -> str:
     except Exception as exc:
         return f"[Erro LLM] {exc}"
 
+# ---------- Loop Principal ---------- #
+try:
+    while True:
+        ret, frame = cap.read() #bool, matriz RGB numpy
+        if not ret:
+            break
 
+        # YOLO retorna uma lista de resultados (um por imagem)
+        results = model(frame, verbose=False)
+        result = results[0]
+        annotated = result.plot()  # desenha caixas e labels
+
+        # Extrai as classes detectadas (como strings) para enviar ao LLM
+        labels = [model.model.names[int(cls)] for cls in result.boxes.cls]
+
+        # Atualiza resumo usando LLM de tempos em tempos
+        now = time.time()
+        if now - last_summary_time >= SUMMARY_INTERVAL:
+            summary_text = summarize_labels(labels)
+            last_summary_time = now
+
+        # Sobrepõe o texto no canto superior esquerdo
+        cv2.putText(annotated, summary_text, (10, 30), FONT, 0.7, (0, 255, 0), 2)
+
+        # Exibe a janela
+        cv2.imshow("Webcam YOLO + GPT", annotated)
+        if cv2.waitKey(1) & 0xFF == ord("q"):
+            break
+finally:
+    cap.release()
+    cv2.destroyAllWindows()
 
