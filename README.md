@@ -6,6 +6,7 @@
 * Captura **vídeo ao vivo** (webcam ou arquivo) e roda **YOLOv8** para desenhar *bounding‑boxes* dos objetos.
 * A cada *N* segundos, manda o **frame** pro **GPT‑4o** multimodal, que devolve um resumo curtinho em português.
 * Exibe tudo **em tempo real** numa interface **Gradio**: frame anotado de um lado, descrição do outro.
+*Notifica **no Desktop** caso hajam **Tags de interesse** no frame ou na anotação do YOLO.
 
 ![demo-gif](docs/demo.gif)
 
@@ -21,6 +22,7 @@
 | **OpenAI SDK v1**      | Chat multimodal GPT‑4o                           |
 | **Gradio**             | UI web rapidinha                                 |
 | **python‑dotenv**      | Chave `OPENAI_API_KEY=`                          |
+| **plyer**              | Notificações no windows                          |
 
 ---
 
@@ -59,8 +61,9 @@ py -3.12 detector_objetos_webcam.py # abre no browser http://127.0.0.1:7860
 ### 🌐 UI Gradio
 
 1. Faça upload de um vídeo **(ou coloque para webcam)**
-2. Clique em **Processar em tempo real**
-3. Observe as etiquetas do yolo e os resumos de frames
+2. Adicione **tags de interesse**, objetos que você quer rastrear nos frames.
+3. Clique em **Processar em tempo real**
+4. Observe as etiquetas do yolo e os resumos de frames
 
 ---
 
